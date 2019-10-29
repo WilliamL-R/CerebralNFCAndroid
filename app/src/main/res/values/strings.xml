@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CerebralNFC</string>
+    <string name="tag_button">Set Tag Here</string>
+</resources>

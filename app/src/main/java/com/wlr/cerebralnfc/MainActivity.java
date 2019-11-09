@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
@@ -16,19 +17,22 @@ public class MainActivity extends AppCompatActivity {
     EditText tagText;
     Button tagButton;
     NdefRecord tagRecord;
+    String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tagText = (EditText)findViewById(R.id.EditTagText);
-        tagButton = (Button)findViewById(R.id.TagButton);
+        tagText = findViewById(R.id.EditTagText);
+        tagButton = findViewById(R.id.TagButton);
         tagButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tagRecord = createTextTag(tagText.toString(), Locale.UK, true);
+                tagRecord = createTextTag(tagText.getText().toString(), Locale.UK, true);
                 Log.d("NdefRecord", tagRecord.toString());
+                message = getTextFromNdefRecord(tagRecord);
+                Log.d("message", message);
             }
         });
     }
@@ -50,6 +54,27 @@ public class MainActivity extends AppCompatActivity {
                 new byte[0], data);
 
         return record;
+    }
+
+    private String getTextFromNdefRecord (NdefRecord ndefRecord)
+    {
+        String content = null;
+
+        try
+        {
+            byte[] payload = ndefRecord.getPayload();
+            String encoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTf-8";
+
+            int languageSize = payload[0] & 0063;
+
+            content = new String(payload, languageSize+1, payload.length - languageSize - 1, encoding);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            Log.e("createTextRecord", e.getMessage());
+        }
+
+        return content;
     }
 
 }

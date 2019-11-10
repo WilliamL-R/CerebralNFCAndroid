@@ -9,7 +9,6 @@ import android.os.Bundle;
  */
 public class CerebralHostApduService extends HostApduService {
 
-
     // Reads APDU command sent by NFC reader.
     @Override
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
